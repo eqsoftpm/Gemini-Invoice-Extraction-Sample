@@ -1,0 +1,138 @@
+{
+  "contents": [
+    {
+      "parts": [
+        {
+          "text": "Extract all possible invoice details including buyer and supplier information, item details (HSN, GST rates, SGST, CGST, IGST, cess, additional cess, batch number, expiry date), discounts at different levels, free quantity, replacement quantity, total values, payment details, eInvoice details, eWay details, and PO details."
+        },
+        {
+          "file_data": {
+            "mime_type": "{{doctype}}",
+            "file_uri": "{{fileuri}}"
+          }
+        }
+      ]
+    }
+  ],
+  "generationConfig": {
+    "response_mime_type": "application/json",
+    //"response_schema": {      
+    //  "type": "object",
+    //  "properties": {
+    //    "invoiceNumber": {
+    //      "type": "string"
+    //    },
+    //    "invoiceDate": {
+    //      "type": "string"
+    //    },
+    //    "poNumber": {
+    //      "type": "string"
+    //    },
+    //    "paymentDueDate": {
+    //      "type": "string"
+    //    },
+    //    "seller": {
+    //      "type": "object",
+    //      "properties": {
+    //        "name": {
+    //          "type": "string"
+    //        },
+    //        "gstin": {
+    //          "type": "string"
+    //        },
+    //        "address": {
+    //          "type": "array",
+    //          "items": {
+    //            "type": "string"
+    //          },
+    //          "maxItems": 3
+    //        },
+    //        "state": {
+    //          "type": "string"
+    //        },
+    //        "stateCode": {
+    //          "type": "string"
+    //        }
+    //      }
+    //    },
+    //    "buyer": {
+    //      "type": "object",
+    //      "properties": {
+    //        "name": {
+    //          "type": "string"
+    //        },
+    //        "gstin": {
+    //          "type": "string"
+    //        },
+    //        "address": {
+    //          "type": "array",
+    //          "items": {
+    //            "type": "string"
+    //          },
+    //          "maxItems": 3
+    //        },
+    //        "state": {
+    //          "type": "string"
+    //        },
+    //        "stateCode": {
+    //          "type": "string"
+    //        }
+    //      }
+    //    },
+    //    "items": {
+    //      "type": "array",
+    //      "items": {
+    //        "type": "object",
+    //        "properties": {
+    //          "description": {
+    //            "type": "string"
+    //          },
+    //          "hsnCode": {
+    //            "type": "string"
+    //          },
+    //          "quantity": {
+    //            "type": "number"
+    //          },
+    //          "unitPrice": {
+    //            "type": "number"
+    //          },
+    //          "taxableValue": {
+    //            "type": "number"
+    //          },
+    //          "gstRate": {
+    //            "type": "number"
+    //          },
+    //          "cgst": {
+    //            "type": "number"
+    //          },
+    //          "sgst": {
+    //            "type": "number"
+    //          },
+    //          "igst": {
+    //            "type": "number"
+    //          },
+    //          "cess": {
+    //            "type": "number"
+    //          }
+    //        }
+    //      }
+    //    },
+    //    "totalTaxableValue": {
+    //      "type": "number"
+    //    },
+    //    "totalCGST": {
+    //      "type": "number"
+    //    },
+    //    "totalSGST": {
+    //      "type": "number"
+    //    },
+    //    "totalIGST": {
+    //      "type": "number"
+    //    },
+    //    "invoiceTotal": {
+    //      "type": "number"
+    //    }
+    //  }
+    //}
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "contents": [
+    {
+      "parts": [
+        {
+          "text": "Extract all invoice details from the provided file, following Indian GST regulations, and format the output as structured JSON per the schema below.  Populate all fields, including required ones, using the following logic: *Seller/Buyer Details:* Extract `name`, `address` (split into exactly 3 lines, pad with empty strings if needed), `state`, `state_code` (first 2 digits of `gstin`), `pin_code`, `phone`, `email`, and `gstin`. If missing: infer `state_code` from `gstin` or address; set `phone`, `email`, `pin_code` to 'NA'; use 'URD' for unregistered `gstin`. *Invoice Details:* Extract `invoice_no`, `date` (DD-MMM-YYYY), `po_number`, `due_date` (DD-MMM-YYYY), `vehicle_number`, `eway_bill_no`, and `einvoice_details` (`irn`, `ack_number`, `ack_date` in DD-MMM-YYYY). If missing: set dates to '01-Jan-1900', others to 'NA'.*Products:* For each item, extract `sl_no` (sequential if absent), `name`, `hsn`, `gst_rate` (`sgst`, `cgst`, `igst`, `cess`), `quantity`, `free_qty`, `replacement_qty`, `unit`, `unit_price`, `amount`, `discount_levels` (3 values, default [0, 0, 0] if unclear), `taxable_amount`, tax amounts (`sgst`, `cgst`, `igst`, `cess`, `additional_cess`), `discount_after_tax`, and `total_amount`. If missing: set `free_qty`, `replacement_qty`, `additional_cess`, `discount_after_tax` to 0; infer `unit` as 'Nos'; calculate `taxable_amount` = `amount` - discounts.*GST Logic:* Determine GST type by comparing `state_code` of seller and buyer: same = GST (split tax into `sgst` + `cgst`); different = IGST (`igst` only). If item-wise `gst_rate` or amounts are missing, derive from `taxable_amount` and footer `total_gst_amount`, assuming uniform rates across items. If GST only in footer, distribute proportionally by `taxable_amount`. Set unused tax fields to 0. *Footer:* Extract `total_product_count` (item count), `total_qty`, `total_free_qty`, `total_replacement`, `total_amount`, `total_discounts`, `total_taxable_amount`, `total_gst_amount`, `total_after_tax_discounts`, `final_total`, `additional_discount`, `additional_charges`, `freight`, `transportation`, `loading_unloading`, `packing_charges`, `tds`, `tcs`, `round_off`. If missing: compute from items, set charges/discounts to 0.*Discounts/Charges:* Map item-level discounts to `discount_levels` (pad with 0s if <3). Assign footer discounts to `additional_discount`, charges (e.g., `freight`) to respective fields.*Edge Cases:* Multi-page: aggregate data. Inconsistencies: recalculate totals and list in `issues`. Ambiguous GST type: default to GST. *Output Rules:* Use 'NA' for missing strings, '01-Jan-1900' for missing dates (DD-MMM-YYYY format), 0 for missing numbers. List any issues (e.g., missing data, recalculations) in `issues` array. Return JSON matching the schema."
+        },
+        {
+          "file_data": {
+            "mime_type": "{{doctype}}",
+            "file_uri": "{{fileuri}}"
+          }
+        }
+      ]
+    }
+  ],
+  "generationConfig": {
+    "response_mime_type": "application/json",
+    "response_schema": {
+      "type": "object",
+      "properties": {
+        "seller_details": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "address": {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "state": { "type": "string" },
+            "state_code": { "type": "string" },
+            "pin_code": { "type": "string" },
+            "phone": { "type": "string" },
+            "email": { "type": "string" },
+            "gstin": { "type": "string" }
+          },
+          "required": [ "name", "address", "state", "state_code", "pin_code", "phone", "email", "gstin" ]
+        },
+        "buyer_details": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "address": {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "state": { "type": "string" },
+            "state_code": { "type": "string" },
+            "pin_code": { "type": "string" },
+            "phone": { "type": "string" },
+            "email": { "type": "string" },
+            "gstin": { "type": "string" }
+          },
+          "required": [ "name", "address", "state", "state_code", "pin_code", "phone", "email", "gstin" ]
+        },
+        "invoice_details": {
+          "type": "object",
+          "properties": {
+            "invoice_no": { "type": "string" },
+            "date": {
+              "type": "string"
+            },
+            "po_number": { "type": "string" },
+            "due_date": {
+              "type": "string"
+            },
+            "vehicle_number": { "type": "string" },
+            "eway_bill_no": { "type": "string" },
+            "einvoice_details": {
+              "type": "object",
+              "properties": {
+                "irn": { "type": "string" },
+                "ack_number": { "type": "string" },
+                "ack_date": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "products": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sl_no": { "type": "integer" },
+              "name": { "type": "string" },
+              "hsn": { "type": "string" },
+              "gst_rate": {
+                "type": "object",
+                "properties": {
+                  "sgst": { "type": "number" },
+                  "cgst": { "type": "number" },
+                  "igst": { "type": "number" },
+                  "cess": { "type": "number" }
+                }
+              },
+              "quantity": { "type": "number" },
+              "free_qty": { "type": "number" },
+              "replacement_qty": { "type": "number" },
+              "unit": { "type": "string" },
+              "unit_price": { "type": "number" },
+              "amount": { "type": "number" },
+              "discount_levels": {
+                "type": "array",
+                "items": { "type": "number" },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "taxable_amount": { "type": "number" },
+              "sgst": { "type": "number" },
+              "cgst": { "type": "number" },
+              "igst": { "type": "number" },
+              "cess": { "type": "number" },
+              "additional_cess": { "type": "number" },
+              "discount_after_tax": { "type": "number" },
+              "total_amount": { "type": "number" }
+            }
+          }
+        },
+        "footer": {
+          "type": "object",
+          "properties": {
+            "total_product_count": { "type": "integer" },
+            "total_qty": { "type": "number" },
+            "total_free_qty": { "type": "number" },
+            "total_replacement": { "type": "number" },
+            "total_amount": { "type": "number" },
+            "total_discounts": { "type": "number" },
+            "total_taxable_amount": { "type": "number" },
+            "total_gst_amount": { "type": "number" },
+            "total_after_tax_discounts": { "type": "number" },
+            "final_total": { "type": "number" },
+            "additional_discount": { "type": "number" },
+            "additional_charges": { "type": "number" },
+            "freight": { "type": "number" },
+            "transportation": { "type": "number" },
+            "loading_unloading": { "type": "number" },
+            "packing_charges": { "type": "number" },
+            "tds": { "type": "number" },
+            "tcs": { "type": "number" },
+            "round_off": { "type": "number" }
+          }
+        },
+        "remarks_terms": { "type": "string" },
+        "issues": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": [ "seller_details", "buyer_details", "invoice_details", "products", "footer" ]
+    }
+
+  }
+}
